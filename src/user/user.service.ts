@@ -85,7 +85,11 @@ export class UserService {
   }
 
   async updateUser(
-    userId: NumericType,
+    userId: number,
     updateUserDTO: UpdateUserDTO,
-  ): Promise<UserEntity> {}
+  ): Promise<UserEntity> {
+    const user = await this.findById(userId);
+    Object.assign(user, updateUserDTO);
+    return this.userRepository.save(user);
+  }
 }
