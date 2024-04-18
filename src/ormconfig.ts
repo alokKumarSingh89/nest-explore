@@ -13,4 +13,4 @@ const config: PostgresConnectionOptions = {
   logging: true,
 };
 export default config;
-// For Create provide the full path
+// For Create(migrate:create i.e src/migrations/FILE_NAME) provide the full path
