@@ -14,6 +14,7 @@ import { LoginUserDTO } from './dto/loginUser.dto';
 import { User } from './decorators/user.decorator';
 import { UserEntity } from './user.entity';
 import { AuthGuard } from './guard/auth.guard';
+import { UpdateUserDTO } from './dto/updateUser.dto';
 
 @Controller()
 export class UserController {
@@ -43,6 +44,16 @@ export class UserController {
   async getCurrentUser(
     @User() user: UserEntity,
   ): Promise<UserResponseInterface> {
+    return this.userService.buildUserResponse(user);
+  }
+
+  @Post('user')
+  @UseGuards(AuthGuard)
+  async updateCurrentUser(
+    @User('id') id: number,
+    @Body('user') updateUserDTO: UpdateUserDTO,
+  ): Promise<UserResponseInterface> {
+    const user = await this.userService.updateUser(id, updateUserDTO);
     return this.userService.buildUserResponse(user);
   }
 }

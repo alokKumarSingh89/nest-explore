@@ -8,6 +8,7 @@ import { UserResponseInterface } from './types/userResponse.interface';
 import { LoginUserDTO } from './dto/loginUser.dto';
 import * as bcrypt from 'bcrypt';
 import { JSON_WEB_TOKEN } from '@app/config';
+import { UpdateUserDTO } from './dto/updateUser.dto';
 
 @Injectable()
 export class UserService {
@@ -82,4 +83,9 @@ export class UserService {
   async findById(id: number): Promise<UserEntity> {
     return this.userRepository.findOne({ where: { id } });
   }
+
+  async updateUser(
+    userId: NumericType,
+    updateUserDTO: UpdateUserDTO,
+  ): Promise<UserEntity> {}
 }
