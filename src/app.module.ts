@@ -4,9 +4,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import config from '@app/ormconfig';
 import { UserModule } from '@app/user/user.module';
 import { AuthMiddleware } from '@app/middlewares/auth.middleware';
+import { ArticalModule } from '@app/articles/article.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(config), TagModule, UserModule],
+  imports: [
+    TypeOrmModule.forRoot(config),
+    TagModule,
+    UserModule,
+    ArticalModule,
+  ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
