@@ -5,6 +5,8 @@ import {
   Get,
   Param,
   Post,
+  Put,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -15,14 +17,19 @@ import { CreateArticleDTO } from './dto/article.dto';
 import { UserEntity } from '@app/user/user.entity';
 import { AuthGuard } from '@app/user/guard/auth.guard';
 import { ArticleResponse } from './types/articleResponse.interface';
+import { ArticlesResponse } from './types/articlesResponse.interface';
+import { QueryInterface } from './types/query.interface';
 
 @Controller('articles')
 export class ArticleController {
   constructor(readonly articleService: ArticleService) {}
 
   @Get()
-  async allArticle(): Promise<any> {
-    return this.articleService.getAllArticle();
+  async findAll(
+    @User('id') currenctUserId: number,
+    @Query() quary: QueryInterface,
+  ): Promise<ArticlesResponse> {
+    return this.articleService.getAllArticle(currenctUserId, quary);
   }
 
   @Post()
@@ -52,5 +59,20 @@ export class ArticleController {
     @Param('slug') slug: string,
   ) {
     return this.articleService.deleteArticle(currenctUserId, slug);
+  }
+  @Put(':slug')
+  @UseGuards(AuthGuard)
+  @UsePipes(new ValidationPipe())
+  async updateArticle(
+    @User('id') currenctUserId: number,
+    @Param('slug') slug: string,
+    @Body('article') updateArticleDTO: CreateArticleDTO,
+  ): Promise<ArticleResponse> {
+    const article = await this.articleService.updateArticle(
+      currenctUserId,
+      slug,
+      updateArticleDTO,
+    );
+    return this.articleService.buildArticleRespose(article);
   }
 }
