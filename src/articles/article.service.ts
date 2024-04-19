@@ -13,6 +13,7 @@ export class ArticleService {
   constructor(
     @InjectRepository(ArticleEntity)
     readonly articleRepo: Repository<ArticleEntity>,
+    @InjectRepository(UserEntity) readonly userRepo: Repository<UserEntity>,
     readonly dataSource: DataSource,
   ) {}
 
@@ -87,6 +88,53 @@ export class ArticleService {
     }
     Object.assign(article, updateArticleDTO);
     return this.articleRepo.save(article);
+  }
+  async makeFavorite(
+    currenctUserId: number,
+    slug: string,
+  ): Promise<ArticleEntity> {
+    const article = await this.getBySlug(slug);
+    const user = await this.userRepo.findOne({
+      where: {
+        id: currenctUserId,
+      },
+      relations: ['favorites'],
+    });
+
+    const isNotFavorite =
+      user.favorites.findIndex((favorated) => favorated.id === article.id) ===
+      -1;
+    if (isNotFavorite) {
+      user.favorites.push(article);
+      article.favoritesCount++;
+      this.userRepo.save(user);
+      this.articleRepo.save(article);
+    }
+    return article;
+  }
+
+  async removeFromFavorite(
+    currenctUserId: number,
+    slug: string,
+  ): Promise<ArticleEntity> {
+    const article = await this.getBySlug(slug);
+    const user = await this.userRepo.findOne({
+      where: {
+        id: currenctUserId,
+      },
+      relations: ['favorites'],
+    });
+
+    const articleIndex = user.favorites.findIndex(
+      (favorated) => favorated.id === article.id,
+    );
+    if (articleIndex >= 0) {
+      user.favorites.splice(articleIndex, 1);
+      article.favoritesCount--;
+      this.userRepo.save(user);
+      this.articleRepo.save(article);
+    }
+    return article;
   }
   buildArticleRespose(article: ArticleEntity): ArticleResponse {
     return { article };
